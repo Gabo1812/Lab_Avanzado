@@ -53,13 +53,13 @@
 // ** thin films", to appear in Applied Numerical Mathematics 47,  **
 // ** pp. 109-119, 2003.                                           **
 // **                                                              **
-// ** S. Ventura, E. G. Birgin, J. M. Martínez and                 **
+// ** S. Ventura, E. G. Birgin, J. M. Martï¿½nez and                 **
 // ** I. Chambouleyron, "Optimization techniques for the           **
 // ** estimation of the thickness and the optical parameters of    **
 // ** thin films using reflectance data", Journal of Applied       **
 // ** Physics 97, 043512, 2005.                                    **
 // **                                                              **
-// ** R. Andrade, E. G. Birgin, I. Chambouleyron, J. M. Martínez   **
+// ** R. Andrade, E. G. Birgin, I. Chambouleyron, J. M. Martï¿½nez   **
 // ** and S. D. Ventura, "Estimation of the thickness and the      **
 // ** optical parameters of several superimposed thin films using  **
 // ** optimization", Applied Optics 47, pp. 5208-5220, 2008.       **
@@ -1546,6 +1546,17 @@ int nobs,double lini,double lfin,char datfile[])
 	  sqrt( 1.0 + 0.18394 * film.lambda[i] * film.lambda[i] / 
                       ( film.lambda[i] * film.lambda[i] - 18231.83 ) );
 
+   // Soda-Lime Glass (SLG) como sustrato personalizado
+  else if (substrate == 70) {
+    
+      for (i = 0; i < nobs; i++) {
+          double lam_um = film.lambda[i] / 1000.0;  // conv. de nm a Âµm
+          film.s[i] = 1.5130
+                      - 0.003169 * (lam_um * lam_um)
+                      + 0.003962 / (lam_um * lam_um);
+      }
+}
+                   
    else Error("Invalid substrate (10=Glass, 20=Crystalline silicon, 30=Crystalline quartz, 40=Glass slides, 50=Borosilicate, 60=Amorphous quartz)");
 
   // Read the observed data (transmittance and/or reflectance) and
