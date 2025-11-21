@@ -4,7 +4,7 @@ C      William E. Vargas, CICIMA AND PHYSICS DEPARTMENT, UNIVERSITY OF
 C      COSTA RICA.
 C      ----------------------------------------------------------------
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        PARAMETER (NO=4)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
@@ -288,7 +288,7 @@ C      FRACTION OF VOIDS OR EMPTY VOLUME
 C      -----------------------------------------------------------------
        SUBROUTINE PACKING(EPSB,EPSF,P,DELTAP)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21)
+       PARAMETER (NOBS=41)
        REAL*8 VP(NOBS)
        COMPLEX*16 EPSB(NOBS),EPSF(NOBS),Z
        DO I=1,NOBS
@@ -311,7 +311,7 @@ C      -----------------------------------------------------------------
 C      -----------------------------------------------------------
        SUBROUTINE AVERAGES(NEWHF,NEWNF,NEWKF,DHF,DELTANF,DELTAKF)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)	
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)	
        COMMON /OPTICS3/ TF(NOBS),MNF(NOBS,NOBS),MKF(NOBS,NOBS)
        REAL*8 TF,MNF,MKF,NEWNF(NOBS),NEWKF(NOBS),NEWHF,DHF
        REAL*8 DNF(NOBS),DKF(NOBS)
@@ -359,7 +359,7 @@ C      -----------------------------------------------------------
        SUBROUTINE SPG(X,L,U,M,EPS,MAXIT,MAXIFCNT, 
      & F,CGNORM,ITER,IFCNT,IGCNT,FLAG,IWL)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
        COMMON /OPTICS2/ TEXP(NOBS)  
@@ -454,7 +454,7 @@ C      ----------------------------------------------------------------
        SUBROUTINE LINESEARCH(X,F,D,GTD,FNEW, 
      & XNEW,M,LASTFVALUES,IFCNT,IWL)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
        COMMON /OPTICS2/ TEXP(NOBS)             
@@ -495,7 +495,7 @@ C      ----------------------------------------------------------------
 C      -----------------------------------------------------------------
        SUBROUTINE EVALF(Y,F)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
        COMMON /OPTICS2/ TEXP(NOBS)
@@ -575,7 +575,7 @@ C         R(I)=(R13+D00*Y2/(Z00*B00-R31*Y2))/B00
 c      ------------------------------------------------------------------
        SUBROUTINE EVALG(Y,G,IWL)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
        COMMON /OPTICS2/ TEXP(NOBS)
@@ -724,7 +724,7 @@ C        --------------------------------
 C      --------------------------------------------------------------
        SUBROUTINE EVALFG(Y,F,G,IWL)
        IMPLICIT REAL*8 (A-H,O-Z)
-       PARAMETER (NOBS=21,NOBS2=2*NOBS)
+       PARAMETER (NOBS=41,NOBS2=2*NOBS)
        COMMON /OPTICS0/ HF,HS
        COMMON /OPTICS1/ WL(NOBS),NS(NOBS),KS(NOBS),T(NOBS)
        COMMON /OPTICS2/ TEXP(NOBS)
