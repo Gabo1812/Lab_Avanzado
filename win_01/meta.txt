@@ -1,0 +1,4 @@
+Ventana centrada en λ=400 nm ±20 nm
+NOBS = 21
+Rango: 400.0 – 420.0 nm
+Recuerda cambiar PARAMETER (NOBS = NOBS) en FILM0.f

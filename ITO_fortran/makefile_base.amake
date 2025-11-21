@@ -1,0 +1,94 @@
+
+#
+# Absoft Developer Tools Interface requires use of this makefile.
+#
+.SHELL: name="cmd.exe"
+MKDIR=if not exist "$(OBJDIR)" mkdir 
+RMDIR=rmdir /S /Q
+
+#
+# Variables for the compiler(s) and linker
+#
+ABSOFT_F95=f95
+ABSOFT_F77=f95
+VAST_PREPROCESSOR=vastfp.exe
+RC=rc.exe
+CL=cl.exe
+MAKE=amake2
+ABSOFT_F95_LINKER=f95
+DUMMY=
+
+#
+# Flags
+#
+ABSOFT_F95_FLAGS=     -O2 -m32 -stack:32768000
+ABSOFT_F77_FLAGS=     -O2 -f77_compat -m32 -stack:32768000
+RC_FLAGS=
+CL_FLAGS= -O2
+MAKE_FLAGS= -k
+ABSOFT_F95_LINKER_FLAGS=-IPA:debug=on -IPA:source_pu_order=on              -m32 -stack:32768000 -O2
+
+#
+# Name of the executable
+#
+TARGET=project.exe
+OUTDIR=.
+OBJDIR=.\Release
+
+#
+# Files for this executable
+#
+VAST_PREPROCESSOR_FILES=
+ABSOFT_F95_FILES=
+ABSOFT_F77_FILES="FILM0.f"
+CL_FILES=
+ABSOFT_F95_LINKER_FILES=
+RC_FILES=
+MAKE_FILES=
+
+#
+# Rules and dependencies for the executable
+#
+SRCFILES=$(ABSOFT_F77_FILES)
+OBJFILES="$(OBJDIR)\FILM0.obj"
+all: "$(OBJDIR)" "$(OUTDIR)\$(TARGET)"
+	
+
+"$(OUTDIR)\$(TARGET)":  $(OBJFILES) $(ABSOFT_F95_LINKER_FILES) $(MODFILES) $(RC_FILES)
+	$(ABSOFT_F95_LINKER)  $(LPATHS) $(OBJFILES) $(ABSOFT_F95_LINKER_FILES) $(LIBS) -o "$(OUTDIR)\$(TARGET)" $(ABSOFT_F95_LINKER_FLAGS)
+	IF %errorlevel% NEQ 0 EXIT 1
+
+
+
+"$(OBJDIR)\FILM0.obj": "FILM0.f"
+	$(ABSOFT_F77) -c -nowdir -YLOOP_ANALYZER -LNO:simd_verbose=on -LNO:apo_verbose=on -CG:filetable_verbose=on $(ABSOFT_F77_FLAGS) -o "$(OBJDIR)\FILM0.obj" "FILM0.f"
+	IF %errorlevel% NEQ 0 EXIT 1
+
+"$(OBJDIR)":
+	$(MKDIR) "$(OBJDIR)"
+#
+# Clean Rules
+#
+clean:
+	 if exist "$(OBJDIR)" $(RMDIR) "$(OBJDIR)" 
+	 if exist "$(TARGET)" erase "$(TARGET)"
+	 if exist "project.pdb" erase "project.pdb"
+	 if exist makefile.amake erase makefile.amake
+	 if exist makefile.amake.bk erase makefile.amake.bk
+	 if exist makefile_base.amake erase makefile_base.amake
+
+#
+# Define necessary macros for dependency scanning.
+#
+MKDEP=amakedepend
+MKDEP_FLAGS= -quiet "-pre$(OBJDIR)\"\" -Y -modInfo -errdel -f90 -f makefile.amake
+#
+# Generate dependencies for the project
+#
+ScanAll: "$(OUTDIR)" "$(OBJDIR)" MakeDepsAll
+
+#
+# Scan for all F77/F95, and c/c++ dependencies
+#
+MakeDepsAll:
+	$(MKDEP) -quiet "-pre.\Release\\" -Y -modInfo -errdel -f90 -f makefile.amake -a -info      -O2 -f77_compat -m32 -stack:32768000 -info "FILM0.f" 
