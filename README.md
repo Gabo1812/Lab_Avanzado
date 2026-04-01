@@ -22,9 +22,9 @@ The forward model describes the optical transmittance of a thin absorbing film d
 
 The transmittance is modeled as:
 
-$$$$
+$$
 T(\lambda) = \frac{A x}{B - Cx + Dx^2}
-$$$$
+$$
 
 with:
 
@@ -47,15 +47,15 @@ This model is **nonlinear, highly coupled, and oscillatory**, making inversion n
 
 Given measured transmittance data:
 
-$$$$
+$$
 T_{\text{meas}}(\lambda_i)
-$$$$
+$$
 
 we solve:
 
-$$$$
+$$
 \min_{d,\,n(\lambda),\,k(\lambda)} \sum_i \left[T_{\text{model}}(\lambda_i) - T_{\text{meas}}(\lambda_i)\right]^2
-$$$$
+$$
 
 ### Ill-posedness
 
@@ -86,9 +86,9 @@ Instead of directly solving a constrained optimization problem, PUMA reformulate
 
 This transforms the problem into a high-dimensional nonlinear minimization:
 
-$$$$
+$$
 \min f(x)
-$$$$
+$$
 
 where $$ x $$ includes:
 
