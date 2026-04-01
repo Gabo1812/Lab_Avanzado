@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project focuses on the numerical inversion of optical properties of thin films from transmittance data. The goal is to recover the refractive index $$ n(\lambda) $$, extinction coefficient $$ k(\lambda) $$, and film thickness $$ d $$ by solving a nonlinear inverse problem.
+This project focuses on the numerical inversion of optical properties of thin films from transmittance data. The goal is to recover the refractive index $n(\lambda)$, extinction coefficient $k(\lambda)$, and film thickness $d$ by solving a nonlinear inverse problem.
 
 The implementation is based on the **PUMA (Pointwise Unconstrained Minimization Approach)** framework, applied to experimental and simulated UV-Vis transmittance spectra of layered systems such as:
 
@@ -36,10 +36,10 @@ This model is **nonlinear, highly coupled, and oscillatory**, making inversion n
 ### Key assumptions
 
 - Planar, homogeneous thin films
-- Known substrate refractive index $$ s(\lambda) $$
+- Known substrate refractive index $s(\lambda)$
 - Normal incidence
 - Coherent multiple reflections
-- No scattering (pure absorption via $$ k(\lambda) $$)
+- No scattering (pure absorption via $k(\lambda)$)
 
 ---
 
@@ -61,15 +61,15 @@ $$
 
 This problem is fundamentally underdetermined:
 
-- For each $$ \lambda $$: 1 equation, 2 unknowns $$ (n, k) $$
+- For each $\lambda$: 1 equation, 2 unknowns $(n, k)$
 - Infinite solution manifold without additional constraints
 
 To regularize the problem, **physical constraints are imposed**:
 
-- $$ n(\lambda) \geq 1 $$, $$ k(\lambda) \geq 0 $$
-- Monotonic behavior: $$ n'(\lambda) \leq 0 $$, $$ k'(\lambda) \leq 0 $$
-- Convexity conditions on $$ n(\lambda) $$ and $$ k(\lambda) $$
-- Inflection point in $$ k(\lambda) $$
+- $n(\lambda) \geq 1$, $k(\lambda) \geq 0$
+- Monotonic behavior: $n'(\lambda) \leq 0$, $k'(\lambda) \leq 0$
+- Convexity conditions on $n(\lambda)$ and $k(\lambda)$
+- Inflection point in $k(\lambda)$
 
 These constraints encode **physical dispersion relations** near the absorption edge.
 
@@ -81,7 +81,7 @@ These constraints encode **physical dispersion relations** near the absorption e
 
 Instead of directly solving a constrained optimization problem, PUMA reformulates it as an **unconstrained problem** via a change of variables:
 
-- Positivity enforced via squares (e.g. $$ n = 1 + u^2 $$)
+- Positivity enforced via squares (e.g. $n = 1 + u^2$)
 - Convexity enforced through second derivatives
 
 This transforms the problem into a high-dimensional nonlinear minimization:
@@ -90,11 +90,11 @@ $$
 \min f(x)
 $$
 
-where $$ x $$ includes:
+where $x$ includes:
 
-- Film thickness $$ d $$
-- Inflection point $$ \lambda_{\text{infl}} $$
-- Discretized representations of $$ n(\lambda) $$, $$ k(\lambda) $$
+- Film thickness $d$
+- Inflection point $\lambda_{\text{infl}}$
+- Discretized representations of $n(\lambda)$, $k(\lambda)$
 
 ---
 
@@ -105,7 +105,7 @@ The minimization is performed using the **Spectral Gradient Method (SGM)**:
 - First-order method (gradient-based)
 - No Hessian required
 - Adaptive step size (Barzilai–Borwein type)
-- Suitable for large-scale problems ($$ \mathcal{O}(10^4) $$ variables)
+- Suitable for large-scale problems ($\mathcal{O}(10^4)$ variables)
 
 Key properties:
 
@@ -122,12 +122,12 @@ From actual simulations:
 - Each run can take **3–4 hours** (cluster execution)
 - Strong sensitivity to:
   - Initial parameter ranges
-  - Inflection point $$ \lambda_{\text{infl}} $$
+  - Inflection point $\lambda_{\text{infl}}$
 - Noise in experimental data significantly affects stability
 
 ### Observed issues
 
-- Non-physical solutions (e.g. $$ k < 0 $$) when constraints are poorly enforced
+- Non-physical solutions (e.g. $k < 0$) when constraints are poorly enforced
 - Slow convergence due to ill-conditioning
 - Multiple local minima
 
@@ -145,14 +145,14 @@ Preliminary results show:
 
 - Good agreement between simulated and experimental transmittance
 - RMSE as low as ~0.06% in favorable cases
-- Physically consistent $$ n(\lambda) $$, $$ k(\lambda) $$ after parameter tuning
+- Physically consistent $n(\lambda)$, $k(\lambda)$ after parameter tuning
 
 However:
 
 - Full convergence is not always achieved
 - Trade-off between fit quality and physical plausibility
 
-*(Insert plots: transmittance fit, $$ n(\lambda) $$, $$ k(\lambda $$)*
+*(Insert plots: transmittance fit, $n(\lambda)$, $k(\lambda$)*
 
 ---
 
