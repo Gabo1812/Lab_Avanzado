@@ -1,115 +1,185 @@
-# Optical Coefficient Inversion
+# Optical Coefficient Inversion in Thin Films
 
 ## Overview
 
-This project focuses on the numerical inversion of optical coefficients from measured or simulated data. The objective is to recover physical parameters such as absorption and scattering coefficients by solving an inverse problem based on a forward physical model.
+This project focuses on the numerical inversion of optical properties of thin films from transmittance data. The goal is to recover the refractive index \( n(\lambda) \), extinction coefficient \( k(\lambda) \), and film thickness \( d \) by solving a nonlinear inverse problem.
+
+The implementation is based on the **PUMA (Pointwise Unconstrained Minimization Approach)** framework, applied to experimental and simulated UV-Vis transmittance spectra of layered systems such as:
+
+- ITO (Indium Tin Oxide)
+- WO₃ (Tungsten Oxide)
+- Soda–lime glass (SLG) substrates
+
+---
 
 ## Physical Model
 
-The system is modeled using [describe your model here, e.g. radiative transfer equation or diffusion approximation].
+The forward model describes the optical transmittance of a thin absorbing film deposited on a transparent substrate, accounting for:
 
-Key assumptions:
+- Multiple internal reflections (interference effects)
+- Absorption within the film
+- Wavelength-dependent refractive indices
 
-* Medium properties: [homogeneous / heterogeneous]
-* Boundary conditions: [specify]
-* Source/illumination: [specify]
+The transmittance is modeled as:
 
-## Mathematical Formulation
+\[
+T(\lambda) = \frac{A x}{B - Cx + Dx^2}
+\]
 
-The problem is formulated as an inverse problem.
+with:
 
-Given measured data:
+- \( x = e^{-\alpha d} \), \( \alpha = \frac{4\pi k}{\lambda} \)
+- \( \phi = \frac{4\pi n d}{\lambda} \)
 
-```
-y = F(x)
-```
+This model is **nonlinear, highly coupled, and oscillatory**, making inversion nontrivial.
 
-Recover:
+### Key assumptions
 
-```
-x
-```
+- Planar, homogeneous thin films
+- Known substrate refractive index \( s(\lambda) \)
+- Normal incidence
+- Coherent multiple reflections
+- No scattering (pure absorption via \( k(\lambda) \))
 
-Where:
+---
 
-* F is the forward model
-* x represents the optical coefficients
-* y corresponds to the observed data
+## Inverse Problem Formulation
 
-Example governing equation (if applicable):
+Given measured transmittance data:
 
-```
-∇ · (D ∇ϕ) - μ_a ϕ = -S
-```
+\[
+T_{\text{meas}}(\lambda_i)
+\]
+
+we solve:
+
+\[
+\min_{d,\,n(\lambda),\,k(\lambda)} \sum_i \left[T_{\text{model}}(\lambda_i) - T_{\text{meas}}(\lambda_i)\right]^2
+\]
+
+### Ill-posedness
+
+This problem is fundamentally underdetermined:
+
+- For each \( \lambda \): 1 equation, 2 unknowns \( (n, k) \)
+- Infinite solution manifold without additional constraints
+
+To regularize the problem, **physical constraints are imposed**:
+
+- \( n(\lambda) \geq 1 \), \( k(\lambda) \geq 0 \)
+- Monotonic behavior: \( n'(\lambda) \leq 0 \), \( k'(\lambda) \leq 0 \)
+- Convexity conditions on \( n(\lambda) \) and \( k(\lambda) \)
+- Inflection point in \( k(\lambda) \)
+
+These constraints encode **physical dispersion relations** near the absorption edge.
+
+---
 
 ## Numerical Method
 
-The inversion is performed using the Pointwise Unconstrained Minimization Approach (PUMA), which formulates the inverse problem as a pixel-wise (or pointwise) optimization problem.
+### PUMA Framework
 
-In this framework, the optical coefficients are estimated by minimizing a cost function that measures the discrepancy between observed data and model predictions.
+Instead of directly solving a constrained optimization problem, PUMA reformulates it as an **unconstrained problem** via a change of variables:
 
-The forward model is embedded within an analysis-by-synthesis scheme:
+- Positivity enforced via squares (e.g. \( n = 1 + u^2 \))
+- Convexity enforced through second derivatives
 
-* A trial set of optical parameters is proposed
-* The forward model is solved to generate synthetic data
-* The mismatch with measured data is evaluated
-* Parameters are iteratively updated to reduce this mismatch
+This transforms the problem into a high-dimensional nonlinear minimization:
 
-The resulting optimization problem is solved using the Spectral Gradient Method (SGM), an efficient first-order iterative method that improves convergence over standard gradient descent by incorporating spectral step-length estimation.
+\[
+\min f(x)
+\]
 
-Key features of the method:
+where \( x \) includes:
 
-* Fully iterative and gradient-based
-* Does not require explicit Hessian computation
-* Suitable for large-scale inverse problems
+- Film thickness \( d \)
+- Inflection point \( \lambda_{\text{infl}} \)
+- Discretized representations of \( n(\lambda) \), \( k(\lambda) \)
 
-Important considerations:
+---
 
-* The inverse problem is inherently ill-posed and may require regularization
-* Convergence depends strongly on the initial guess
-* Sensitivity to noise in the observed data can affect stability
+### Optimization Algorithm
 
+The minimization is performed using the **Spectral Gradient Method (SGM)**:
+
+- First-order method (gradient-based)
+- No Hessian required
+- Adaptive step size (Barzilai–Borwein type)
+- Suitable for large-scale problems (\( \mathcal{O}(10^4) \) variables)
+
+Key properties:
+
+- Fast per iteration
+- Sensitive to scaling and initialization
+- Can converge to local minima
+
+---
+
+## Practical Implementation Notes
+
+From actual simulations:
+
+- Each run can take **3–4 hours** (cluster execution)
+- Strong sensitivity to:
+  - Initial parameter ranges
+  - Inflection point \( \lambda_{\text{infl}} \)
+- Noise in experimental data significantly affects stability
+
+### Observed issues
+
+- Non-physical solutions (e.g. \( k < 0 \)) when constraints are poorly enforced
+- Slow convergence due to ill-conditioning
+- Multiple local minima
+
+### Mitigation strategies
+
+- Savitzky–Golay filtering of experimental data
+- Careful tuning of parameter ranges
+- Using PUMA results as **initial seed** for more robust forward models (e.g. Fortran implementations)
+
+---
 
 ## Results
 
-Representative results include:
+Preliminary results show:
 
-* Reconstructed optical coefficients
-* Error analysis
-* Comparison with ground truth (if available)
+- Good agreement between simulated and experimental transmittance
+- RMSE as low as ~0.06% in favorable cases
+- Physically consistent \( n(\lambda) \), \( k(\lambda) \) after parameter tuning
 
-(Insert plots or figures here)
+However:
+
+- Full convergence is not always achieved
+- Trade-off between fit quality and physical plausibility
+
+*(Insert plots: transmittance fit, \( n(\lambda) \), \( k(\lambda \))*
+
+---
 
 ## Project Structure
+- src/ # core numerical routines and PUMA interface
+- notebooks/ # data analysis and visualization
+- data/ # experimental transmittance spectra
+- results/ # output coefficients and plots
 
-```
-src/        # core algorithms and solvers
-notebooks/  # exploratory analysis and testing
-results/    # generated figures and outputs
-```
+
+---
 
 ## Installation
 
-Using Conda (recommended):
-
-```
+```bash
 conda env create -f environment.yml
-conda activate [your-environment-name]
-```
-
-## Usage
-
-```
-python main.py
+conda activate optical-inversion
 ```
 
 ## Future Work
-
-* Improve robustness of the inversion algorithm
-* Extend to higher-dimensional models (2D/3D)
-* Incorporate experimental data
-* Explore more advanced regularization techniques
+- Improve regularization (e.g. Tikhonov, Bayesian approaches)
+- Extend to multilayer systems (ITO–WO₃ stacks)
+- Incorporate reflectance data (better conditioning)
+- Replace PUMA with hybrid methods (global + local optimization)
+- Parallelize parameter sweeps
 
 ## Author
 
 Gabriel Alvarez Castrillo
+Physics Student, Universidad de Costa Rica
