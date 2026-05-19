@@ -1575,13 +1575,20 @@ void IniFilm(char id[],int nlayers,int slayer,int substrate,char datatype,
       for ( i = 0; i < nobs; i ++ )
           film.s[i] = 1.51507 + 0.019 * exp( - ( film.lambda[i] - 435.8 ) / 175.09383 );
 
-  // Amorphous Quartz substrate (transparent in the range [200nm,1500nm])
+  // Amorphous Quartz / Fused Silica substrate (transparent in the range [200nm,1500nm])
+  // 3-term Sellmeier from Malitson, J. Opt. Soc. Am. 55, 1205-1209 (1965)
+  // Same formula used in FILM0.f (FUSED_QUARTZ subroutine). lambda in um.
   else if ( substrate == 60 )
 
       for ( i = 0; i < nobs; i ++ )
-          film.s[i] =
-          sqrt( 1.0 + 0.18394 * film.lambda[i] * film.lambda[i] /
-                      ( film.lambda[i] * film.lambda[i] - 18231.83 ) );
+        {
+          double lam_um = film.lambda[i] / 1000.0;
+          double lam2   = lam_um * lam_um;
+          film.s[i] = sqrt( 1.0
+              + 0.6961663 * lam2 / ( lam2 - 0.0684043 * 0.0684043 )
+              + 0.4079426 * lam2 / ( lam2 - 0.1162414 * 0.1162414 )
+              + 0.8974794 * lam2 / ( lam2 - 9.8961610 * 9.8961610 ) );
+        }
 
   // Soda-Lime Glass (SLG) substrate (approx. transparent in 350–1200nm)
   else if ( substrate == 70 )
